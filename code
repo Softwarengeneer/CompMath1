@@ -1,0 +1,137 @@
+import math
+import copy
+
+# Проверка матрицы коэффициентов на корректность
+import a as a
+
+
+def iscorrectarray(a):
+    for row in range(0, len(a)):
+        if (len(a[row]) != len(b)):
+            print('Не соответствует размерность')
+            return False
+
+    for row in range(0, len(a)):
+        if a[row][row] == 0:
+            print('Нулевые элементы на главной диагонали')
+            return False
+    return True
+
+
+def domination(a):
+    for pointer in range(len(a)):
+        sum = 0
+        for poo in range(len(a)):
+            sum += abs(a[pointer][poo])
+        sum -= abs(a[pointer][pointer])
+        if sum >= abs(a[pointer][pointer]):
+            return False
+
+    return True
+
+
+# Условие завершения программы на основе вычисления
+# расстояния между соответствующими элементами соседних
+# итераций в методе решения
+def isneedtocomplete(x_old, x_new):
+    # eps = 0.0001
+    sum_up = 0
+    sum_low = 0
+    for k in range(0, len(x_old)):
+        sum_up += (x_new[k] - x_old[k]) ** 2
+        sum_low += (x_new[k]) ** 2
+
+    return math.sqrt(sum_up / sum_low) < eps
+
+
+# Процедура решения
+def solution(a, b):
+    if (not iscorrectarray(a)):
+        print('Ошибка в исходных данных')
+
+    else:
+        if (domination(a)):
+            print("Найдено диагональное преобладание")
+        else:
+            print("Нет диагонального преобладания")
+        count = len(b)  # количество корней
+
+        x = [1 for k in range(0, count)]  # начальное приближение корней
+        print("начальное приближение: ", end=' ')
+        print(x)
+
+        numberOfIter = 0  # подсчет количества итераций
+        MAX_ITER = 100  # максимально допустимое число итераций
+        while (numberOfIter < MAX_ITER):
+
+            x_prev = copy.deepcopy(x)
+
+            for k in range(0, count):
+                S = 0
+                for j in range(0, count):
+                    if (j != k): S = S + a[k][j] * x[j]
+                x[k] = b[k] / a[k][k] - S / a[k][k]
+            print(x)
+            if isneedtocomplete(x_prev, x):  # проверка на выход
+                break
+
+            numberOfIter += 1
+            if numberOfIter == 100:
+                print("Нет решения")
+                raise SystemExit(0)
+
+        print('Количество итераций на решение: ', numberOfIter + 1)
+
+        return x
+
+    # MAIN - блок программмы
+
+
+hell = int(input("Введите 1, если хотите считать из файла, или 0, если хотетите ввести вручную...   "))
+if hell == 0:
+    n = int(input("Введите размер матрицы n*n"))
+    if n > 20:
+        print("Слишкром много...  ")
+        raise SystemExit(0)
+    a = [0] * n
+    for i in range(n):
+        a[i] = [0] * n
+    for i in range(0, n):
+        for j in range(0, n):
+            print(i + 1)
+            print(j + 1)
+            a[i][j] = int(input("Введите коэффициент "))
+    b = [0] * n
+    for i in range(n):
+        print(i + 1)
+        b[i] = int(input("введите столбец b"))
+    eps = float(input("Введите погрешность"))
+
+    print("Ваши данные:     ")
+    for i in range(n):
+        for j in range(n):
+            print(a[i][j], end=' ')
+            if j == n - 1:
+                print("|", end=' ')
+                print(b[i])
+elif hell == 1:
+
+    file = str(input("Введите название файла... "))
+    eps = float(input("Введите погрешность...  "))
+    lst = []
+    with open(file, 'r') as f:
+        lst = f.readlines()
+    n = len(lst)
+    a = [[0.0 for j in range(len(lst))] for i in range(len(lst))]
+    b = [0] * len(lst)
+    print(n)
+    for i in range(n):
+        mas = lst[i].split()
+        for j in range(n):
+            a[i][j] = float(mas[j])
+        b[i] = float(mas[n])
+
+    for i in range(n):
+        print(*a[i], " ", b[i])
+
+print('Решение: ', solution(a, b))  # Вызываем процедуру решение
